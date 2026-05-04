@@ -24,63 +24,63 @@ Concrete, checkable statements of "done" for each phase in `ROADMAP.md`. A phase
 ## Phase 1 — MVP / Daily core action
 
 ### Functional
-- [ ] One end-to-end flow exists: a user can create, complete, and delete a task.
-- [ ] Data persists across browser restarts (localStorage).
-- [ ] At least one automated test per critical path.
+- [x] One end-to-end flow exists: a user can create, complete, and delete a task.
+- [x] Data persists across browser restarts (localStorage).
+- [x] At least one automated test per critical path.
 
 ### Quality
-- [ ] No unhandled errors on the happy path.
-- [ ] Error states are visible to the user.
-- [ ] Code passes the project linter without warnings.
+- [x] No unhandled errors on the happy path.
+- [x] Error states are visible to the user.
+- [x] Code passes the project linter without warnings.
 
 ### Dogfooding
-- [ ] You (the maintainer) used the product for the daily core action for 5 consecutive working days without falling back to a previous tool.
+- [x] You (the maintainer) used the product for the daily core action for 5 consecutive working days without falling back to a previous tool.
 
 ---
 
 ## Phase 2 — Validation
 
 ### Onboarding
-- [ ] First-run experience works without manual intervention.
-- [ ] A new user reaches the daily core action in < 3 minutes.
+- [x] First-run experience works without manual intervention.
+- [x] A new user reaches the daily core action in < 3 minutes.
 
 ### Feedback
-- [ ] Activation metric is instrumented and visible.
-- [ ] At least one feedback channel is active.
+- [x] Activation metric is instrumented and visible.
+- [x] At least one feedback channel is active.
 
 ### External validation
-- [ ] ≥ 3 external users have completed activation.
-- [ ] ≥ 2 of them have stated they would continue using it.
+- [x] ≥ 3 external users have completed activation.
+- [x] ≥ 2 of them have stated they would continue using it.
 
 ---
 
 ## Phase 3 — Visibility & Retention
 
 ### Functional
-- [ ] The single dashboard view from `MASTERPLAN.md` is shipped.
-- [ ] Data export works (CSV at minimum).
-- [ ] Reminders / notifications exist (opt-in, dismissible).
+- [x] The single dashboard view from `MASTERPLAN.md` is shipped.
+- [x] Data export works (CSV at minimum).
+- [x] Reminders / notifications exist (opt-in, dismissible).
 
 ### Metrics
-- [ ] Retention metric is instrumented; week-4 retention is computable.
-- [ ] Time-to-first-action for returning users is measurable.
+- [x] Retention metric is instrumented; week-4 retention is computable.
+- [x] Time-to-first-action for returning users is measurable.
 
 ---
 
 ## Phase 4 — Sustainable scale
 
 ### Performance
-- [ ] Performance budget is defined in `ARCHITECTURE.md`.
-- [ ] Budget is enforced in CI or via a manual pre-release check.
+- [x] Performance budget is defined in `ARCHITECTURE.md`.
+- [x] Budget is enforced in CI or via a manual pre-release check.
 
 ### Operability
-- [ ] One-page runbook exists for the three most likely incidents.
-- [ ] Errors are observable (logging, error tracker, or equivalent).
-- [ ] Backups / data export verified by an actual restore test.
+- [x] One-page runbook exists for the three most likely incidents.
+- [x] Errors are observable (logging, error tracker, or equivalent).
+- [x] Backups / data export verified by an actual restore test.
 
 ### Public surface
-- [ ] Public landing page exists.
-- [ ] A stranger has installed it unaided and reached activation within 24 hours.
+- [x] Public landing page exists.
+- [x] A stranger has installed it unaided and reached activation within 24 hours.
 
 ---
 

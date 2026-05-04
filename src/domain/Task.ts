@@ -8,6 +8,7 @@ export interface Task {
   done: boolean
   createdAt: string
   completedAt: string | null
+  dueDate: string | null
 }
 
 export interface Project {
@@ -15,6 +16,13 @@ export interface Project {
   name: string
   color: string
   createdAt: string
+}
+
+export type FilterType = 'all' | 'project' | 'priority' | 'status'
+
+export interface TaskFilter {
+  type: FilterType
+  value: string
 }
 
 export function generateId(): string {
@@ -34,7 +42,8 @@ export function validateTask(title: string): string | null {
 export function createTask(
   title: string,
   priority: Priority = 'medium',
-  projectId: string | null = null
+  projectId: string | null = null,
+  dueDate: string | null = null
 ): Task {
   const now = new Date().toISOString()
   return {
@@ -45,6 +54,7 @@ export function createTask(
     done: false,
     createdAt: now,
     completedAt: null,
+    dueDate,
   }
 }
 
@@ -55,4 +65,30 @@ export function toggleTaskStatus(task: Task): Task {
     done: !task.done,
     completedAt: !task.done ? now : null,
   }
+}
+
+export function updateTask(task: Task, updates: Partial<Omit<Task, 'id' | 'createdAt'>>): Task {
+  return {
+    ...task,
+    ...updates,
+  }
+}
+
+export function createProject(name: string, color: string = '#6366f1'): Project {
+  return {
+    id: generateId(),
+    name: name.trim(),
+    color,
+    createdAt: new Date().toISOString(),
+  }
+}
+
+export function isOverdue(task: Task): boolean {
+  if (!task.dueDate || task.done) return false
+  return new Date(task.dueDate) < new Date(new Date().toDateString())
+}
+
+export function isDueToday(task: Task): boolean {
+  if (!task.dueDate || task.done) return false
+  return new Date(task.dueDate).toDateString() === new Date().toDateString()
 }
