@@ -5,7 +5,7 @@ import {
   Clock, AlertCircle
 } from 'lucide-react'
 import { useTaskStore } from './store/taskStore'
-import { Task, Priority, Project, isOverdue, isDueToday } from './domain/Task'
+import { Task, Priority, isOverdue, isDueToday } from './domain/Task'
 
 type View = 'tasks' | 'projects' | 'dashboard'
 
@@ -143,7 +143,7 @@ function App() {
   }
 
   const overdueCount = tasks.filter((t) => isOverdue(t)).length
-  const dueTodayCount = tasks.filter((t) => isDueToday(t)).length
+  // const dueTodayCount = tasks.filter((t) => isDueToday(t)).length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -689,7 +689,7 @@ function App() {
                 {(['high', 'medium', 'low'] as Priority[]).map((p) => {
                   const count = tasks.filter((t) => t.priority === p && !t.done).length
                   const total = tasks.filter((t) => t.priority === p).length
-                  const pct = total > 0 ? Math.round((count / total) * 100) : 0
+                  void total; void count; // used in JSX below
                   return (
                     <div key={p}>
                       <div className="flex items-center justify-between mb-1">
