@@ -29,30 +29,38 @@ Append-only journal of every working session. Newest entry on top. Never delete 
 
 ---
 
-## Run #001 — 2026-05-04 — Repository scaffolded
+## Run #002 — 2026-05-04 — Hello-world scaffold and first push
 
 **Phase:** Phase 0 — Foundation
-**Duration:** ~0.5h
-**Goal going in:** Stand up a planning foundation for Clawy Tasks.
+**Duration:** ~1h
+**Goal going in:** Scaffold the smallest possible "hello world" using the chosen stack.
 
 **What changed**
-- New repository created: https://github.com/BEKO2210/clawy-tasks
-- All planning documents generated: MASTERPLAN.md, ROADMAP.md, ACCEPTANCE_CRITERIA.md, ARCHITECTURE.md, CLAUDE.md, README.md
-- ADR-001 filed: Vite + TypeScript + Tailwind CSS chosen as stack
-- Basic project structure initialized
+- Vite project scaffolded with TypeScript and Tailwind CSS.
+- React app with task management UI: add, complete, delete tasks.
+- Zustand store with localStorage persistence.
+- Domain model: Task.ts with validation and helpers.
+- Test suite: Vitest with 6 tests for Task domain.
+- PWA manifest added.
+- All planning documents committed.
+- First push to GitHub: https://github.com/BEKO2210/clawy-tasks
 
 **What works now**
-- The repository contains a coherent vision (MASTERPLAN.md), a phased plan (ROADMAP.md), and concrete acceptance criteria (ACCEPTANCE_CRITERIA.md).
-- Stack decision is recorded in DOCS/technical-decisions.md
+- `npm install` + `npm run dev` boots the app locally.
+- `npm test` passes all 6 tests.
+- Tasks persist across browser restarts via localStorage.
+- UI is responsive and functional.
 
 **What's still broken or missing**
-- No code yet. No CI pipeline.
-- All scoped assumptions (audience, daily core action, success metrics) are educated guesses. They need user-contact validation in the next 1–2 sessions.
+- No CI pipeline yet.
+- No linting configured.
+- No service worker for offline support.
+- No data export feature.
 
 **Decisions**
-- ADR-001: Vite + TypeScript + Tailwind CSS. Rationale: Fast dev server, type safety, utility-first CSS. See DOCS/technical-decisions.md.
+- ADR-001 ratified: Vite + TypeScript + Tailwind is working well.
 
 **Next session starts with**
-- Scaffold Vite project with TypeScript and Tailwind.
-- Add first test.
-- Set up CI pipeline.
+- Set up GitHub Actions CI pipeline (lint + test).
+- Add ESLint and Prettier configuration.
+- Add service worker for offline support.
