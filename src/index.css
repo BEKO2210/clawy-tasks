@@ -7,10 +7,13 @@
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
   }
   
   body {
     @apply bg-gray-50 text-gray-900;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .dark body {
@@ -36,7 +39,24 @@
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-0.5;
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10;
+  }
+  
+  .safe-area-pb {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
   }
 }
 
@@ -47,5 +67,10 @@
   
   .text-balance {
     text-wrap: balance;
+  }
+  
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
