@@ -1,612 +1,731 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence, PanInfo } from 'framer-motion'
-import confetti from 'canvas-confetti'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Check, Trash2, Calendar, Flag, Edit2,
-  Moon, Sun, Zap, CheckCircle2, Circle, Sparkles,
-  Home, BarChart3, Folder, X
+  Plus, Check, Trash2, Calendar, Flag, Edit2, X, Save,
+  Folder, Filter, Download, ChevronDown, ChevronRight,
+  Clock, AlertCircle, Sparkles
 } from 'lucide-react'
 import { useTaskStore } from './store/taskStore'
-import { Task, Priority, isOverdue } from './domain/Task'
-import '@fontsource/inter/400.css'
-import '@fontsource/inter/500.css'
-import '@fontsource/inter/600.css'
-import '@fontsource/inter/700.css'
+import { Task, Priority, isOverdue, isDueToday } from './domain/Task'
 
-type View = 'tasks' | 'dashboard' | 'projects'
-type Theme = 'light' | 'dark'
-
-// Animation variants
-const slideIn = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  visible: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, x: -100, scale: 0.9 }
-}
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-  exit: { opacity: 0 }
-}
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05 }
-  }
-}
-
-const scaleOnTap = {
-  scale: 0.97,
-  transition: { duration: 0.1 }
-}
-
-// Swipe threshold
-const SWIPE_THRESHOLD = 80
+type View = 'tasks' | 'projects' | 'dashboard'
 
 function App() {
   const [view, setView] = useState<View>('tasks')
-  const [theme, setTheme] = useState<Theme>('light')
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium')
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void setSelectedProjectId
   const [selectedDueDate, setSelectedDueDate] = useState('')
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editingTaskId
   const [editTitle, setEditTitle] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editTitle
   const [editPriority, setEditPriority] = useState<Priority>('medium')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editPriority
   const [editProjectId, setEditProjectId] = useState<string | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editProjectId
   const [editDueDate, setEditDueDate] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editDueDate
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [showProjectForm, setShowProjectForm] = useState(false)
+  const [newProjectName, setNewProjectName] = useState('')
+  const [newProjectColor, setNewProjectColor] = useState('#6366f1')
   const [showFilters, setShowFilters] = useState(false)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void showFilters
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void setShowFilters
   const [activeFilter, setActiveFilter] = useState<{ type: 'all' | 'project' | 'priority' | 'status'; value: string } | null>(null)
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
-  const [streak, setStreak] = useState(0)
-  const [swipedTaskId, setSwipedTaskId] = useState<string | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
+
+
 
   const {
     tasks, projects, addTask, toggleTask, deleteTask, editTask,
     addProject, deleteProject, exportToJSON, exportToCSV
   } = useTaskStore()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void projects
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void editTask
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void addProject
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void deleteProject
-
-  // Toast helper
-  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type })
-    setTimeout(() => setToast(null), 3000)
-  }, [])
-
-  // Confetti on streak
-  useEffect(() => {
-    if (streak > 0 && streak % 5 === 0) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444']
-      })
-      showToast(`🔥 ${streak} tasks completed!`, 'success')
-    }
-  }, [streak, showToast])
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'n') {
-          e.preventDefault()
-          setShowAddModal(true)
-        }
-      }
-      if (e.key === 'Escape') {
-        setEditingTaskId(null)
-        setShowAddModal(false)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTaskTitle.trim()) return
-    
     addTask({
       title: newTaskTitle,
       priority: selectedPriority,
       projectId: selectedProjectId,
       dueDate: selectedDueDate || null,
     })
-    
     setNewTaskTitle('')
     setSelectedDueDate('')
-    setShowAddModal(false)
-    showToast('Task created!', 'success')
   }
 
-  const handleToggleTask = (task: Task) => {
-    toggleTask(task.id)
-    if (!task.done) {
-      setStreak(s => s + 1)
-      showToast('Task completed! ✅', 'success')
+  const handleAddProject = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newProjectName.trim()) return
+    addProject(newProjectName, newProjectColor)
+    setNewProjectName('')
+    setShowProjectForm(false)
+  }
+
+  const startEdit = (task: Task) => {
+    setEditingTaskId(task.id)
+    setEditTitle(task.title)
+    setEditPriority(task.priority)
+    setEditProjectId(task.projectId)
+    setEditDueDate(task.dueDate || '')
+  }
+
+  const saveEdit = (id: string) => {
+    editTask(id, {
+      title: editTitle,
+      priority: editPriority,
+      projectId: editProjectId,
+      dueDate: editDueDate || null,
+    })
+    setEditingTaskId(null)
+  }
+
+  const cancelEdit = () => {
+    setEditingTaskId(null)
+  }
+
+  const applyFilter = (type: 'all' | 'project' | 'priority' | 'status', value: string) => {
+    if (type === 'all') {
+      setActiveFilter(null)
     } else {
-      setStreak(0)
+      setActiveFilter({ type, value })
     }
   }
 
-  const handleDeleteTask = (id: string) => {
-    deleteTask(id)
-    showToast('Task deleted', 'success')
-  }
-
-  const handleSwipe = (task: Task, info: PanInfo) => {
-    const offset = info.offset.x
-    if (offset < -SWIPE_THRESHOLD) {
-      // Swipe left - delete
-      handleDeleteTask(task.id)
-      setSwipedTaskId(null)
-    } else if (offset > SWIPE_THRESHOLD) {
-      // Swipe right - complete
-      handleToggleTask(task)
-      setSwipedTaskId(null)
-    }
-  }
-
-  const handleExport = (format: 'json' | 'csv') => {
-    if (format === 'json') exportToJSON()
-    else exportToCSV()
-    showToast(`Exported as ${format.toUpperCase()}`, 'success')
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void handleExport
-
-  // Filtered tasks
   const filteredTasks = useMemo(() => {
-    let result = tasks
-    if (activeFilter) {
-      switch (activeFilter.type) {
-        case 'project':
-          result = result.filter(t => t.projectId === activeFilter.value)
-          break
-        case 'priority':
-          result = result.filter(t => t.priority === activeFilter.value)
-          break
-        case 'status':
-          result = result.filter(t => activeFilter.value === 'done' ? t.done : !t.done)
-          break
-      }
+    if (!activeFilter || activeFilter.type === 'all') return tasks
+    if (activeFilter.type === 'project') {
+      return tasks.filter((t) => t.projectId === activeFilter.value)
     }
-    return result
+    if (activeFilter.type === 'priority') {
+      return tasks.filter((t) => t.priority === activeFilter.value)
+    }
+    if (activeFilter.type === 'status') {
+      return activeFilter.value === 'done'
+        ? tasks.filter((t) => t.done)
+        : tasks.filter((t) => !t.done)
+    }
+    return tasks
   }, [tasks, activeFilter])
 
-  // Stats
-  const stats = useMemo(() => ({
-    total: tasks.length,
-    pending: tasks.filter(t => !t.done).length,
-    done: tasks.filter(t => t.done).length,
-    overdue: tasks.filter(t => isOverdue(t)).length,
-    highPriority: tasks.filter(t => t.priority === 'high' && !t.done).length,
-    completionRate: tasks.length > 0 ? Math.round((tasks.filter(t => t.done).length / tasks.length) * 100) : 0
-  }), [tasks])
-
-  const priorityColors = {
-    high: 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400',
-    medium: 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400',
-    low: 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400',
+  const handleExportJSON = () => {
+    const data = exportToJSON()
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `clawy-tasks-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
-  const priorityLabels = { high: 'High', medium: 'Medium', low: 'Low' }
+  const handleExportCSV = () => {
+    const data = exportToCSV()
+    const blob = new Blob([data], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `clawy-tasks-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const priorityColors = {
+    high: 'text-red-600 bg-red-50 border-red-200',
+    medium: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+    low: 'text-green-600 bg-green-50 border-green-200',
+  }
+
+  const priorityLabels = {
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+  }
+
+  const getProjectName = (projectId: string | null) => {
+    if (!projectId) return null
+    return projects.find((p) => p.id === projectId)?.name || 'Unknown'
+  }
+
+  const getProjectColor = (projectId: string | null) => {
+    if (!projectId) return null
+    return projects.find((p) => p.id === projectId)?.color || '#6366f1'
+  }
+
+  const overdueCount = tasks.filter((t) => isOverdue(t)).length
 
   return (
-    <div className={`min-h-screen pb-20 ${theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} transition-colors duration-300`}>
-      {/* Toast */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full shadow-lg backdrop-blur-md ${
-              toast.type === 'success' 
-                ? 'bg-emerald-500/90 text-white' 
-                : 'bg-red-500/90 text-white'
-            }`}
-          >
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Add Task Modal */}
-      <AnimatePresence>
-        {showAddModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center"
-            onClick={() => setShowAddModal(false)}
-          >
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white dark:bg-gray-800 w-full sm:w-[500px] sm:rounded-2xl rounded-t-2xl p-6 shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">New Task</h2>
-                <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <form onSubmit={handleAddTask} className="space-y-4">
-                <input
-                  type="text"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  placeholder="What needs to be done?"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <select
-                    value={selectedPriority}
-                    onChange={(e) => setSelectedPriority(e.target.value as Priority)}
-                    className="flex-1 px-3 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-transparent"
-                  >
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                  </select>
-                  <input
-                    type="date"
-                    value={selectedDueDate}
-                    onChange={(e) => setSelectedDueDate(e.target.value)}
-                    className="flex-1 px-3 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-transparent"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium"
-                >
-                  Add Task
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-700/50">
-        <div className="max-w-5xl mx-auto px-4 py-3">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Clawy
-                </h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {stats.pending} pending
-                </p>
-              </div>
-            </motion.div>
-
-            <div className="flex items-center gap-2">
-              {streak > 0 && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-sm font-medium"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  {streak}
-                </motion.div>
-              )}
-              <motion.button
-                whileTap={scaleOnTap}
-                onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-              </motion.button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Clawy Tasks</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {tasks.filter((t) => !t.done).length} tasks remaining
+                {overdueCount > 0 && (
+                  <span className="ml-2 text-red-600 font-medium">
+                    ({overdueCount} overdue)
+                  </span>
+                )}
+              </p>
             </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="w-4 h-4" />
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-1 mt-4">
+            <button
+              onClick={() => setView('tasks')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all active-press ${
+                view === 'tasks'
+                  ? 'bg-primary-100 text-primary-700 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Tasks
+            </button>
+            <button
+              onClick={() => setView('projects')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all active-press ${
+                view === 'projects'
+                  ? 'bg-primary-100 text-primary-700 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Projects
+            </button>
+            <button
+              onClick={() => setView('dashboard')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all active-press ${
+                view === 'dashboard'
+                  ? 'bg-primary-100 text-primary-700 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Dashboard
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-4">
-        <AnimatePresence mode="wait">
-          {view === 'tasks' && (
-            <motion.div
-              key="tasks"
-              variants={fadeIn}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              {/* Quick Filters */}
-              <motion.div 
-                className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide"
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                {['All', 'High', 'Medium', 'Low', 'Done'].map((filter) => (
-                  <motion.button
-                    key={filter}
-                    variants={slideIn}
-                    whileTap={scaleOnTap}
-                    onClick={() => {
-                      if (filter === 'All') setActiveFilter(null)
-                      else if (filter === 'Done') setActiveFilter({ type: 'status', value: 'done' })
-                      else setActiveFilter({ type: 'priority', value: filter.toLowerCase() })
-                    }}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      (filter === 'All' && !activeFilter) || 
-                      (activeFilter?.value === filter.toLowerCase())
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' 
-                        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    {filter}
-                  </motion.button>
-                ))}
-              </motion.div>
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        {view === 'tasks' && (
+          <>
+            {/* Add Task Form */}
+            <form onSubmit={handleAddTask} className="mb-6">
+              <div className="flex gap-2 flex-wrap">
+                <input
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  placeholder="What needs to be done?"
+                  className="flex-1 min-w-[200px] px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <select
+                  value={selectedPriority}
+                  onChange={(e) => setSelectedPriority(e.target.value as Priority)}
+                  className="px-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <select
+                  value={selectedProjectId || ''}
+                  onChange={(e) => setSelectedProjectId(e.target.value || null)}
+                  className="px-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">No Project</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="date"
+                  value={selectedDueDate}
+                  onChange={(e) => setSelectedDueDate(e.target.value)}
+                  className="px-3 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  title="Due date"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-all active-press flex items-center gap-2 shadow-sm hover:shadow-md"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add
+                </button>
+              </div>
+            </form>
 
-              {/* Task List */}
-              <motion.div 
-                className="space-y-2"
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                <AnimatePresence>
-                  {filteredTasks.length === 0 ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-center py-12"
+            {/* Filters & Export */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-all active-press"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {showFilters ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                </button>
+                {activeFilter && (
+                  <span className="text-sm text-primary-600 bg-primary-50 px-2 py-1 rounded-md">
+                    {activeFilter.type}: {activeFilter.value}
+                    <button
+                      onClick={() => setActiveFilter(null)}
+                      className="ml-1 text-primary-400 hover:text-primary-600"
                     >
-                      <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                        <CheckCircle2 className="w-10 h-10 text-indigo-400" />
-                      </div>
-                      <p className="text-gray-400 dark:text-gray-500 font-medium">No tasks yet</p>
-                      <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Tap + to add one</p>
-                    </motion.div>
-                  ) : (
-                    filteredTasks.map((task) => (
-                      <motion.div
-                        key={task.id}
-                        layout
-                        variants={slideIn}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        drag="x"
-                        dragConstraints={{ left: 0, right: 0 }}
-                        dragElastic={0.2}
-                        onDragEnd={(_, info) => handleSwipe(task, info)}
-                        onDragStart={() => setSwipedTaskId(task.id)}
-                        className={`relative overflow-hidden rounded-xl border ${
-                          task.done 
-                            ? 'bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700/50 opacity-60' 
-                            : isOverdue(task)
-                              ? 'bg-white dark:bg-gray-800 border-red-200 dark:border-red-800/50 border-l-4 border-l-red-500'
-                              : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'
-                        }`}
-                      >
-                        {/* Swipe background indicators */}
-                        <div className="absolute inset-0 flex items-center justify-between px-4">
-                          <div className="text-emerald-500 font-medium text-sm">
-                            ✓ Complete
-                          </div>
-                          <div className="text-red-500 font-medium text-sm">
-                            Delete 🗑
-                          </div>
-                        </div>
+                      <X className="w-3 h-3 inline" />
+                    </button>
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleExportJSON}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-all active-press"
+                >
+                  <Download className="w-4 h-4" />
+                  JSON
+                </button>
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-all active-press"
+                >
+                  <Download className="w-4 h-4" />
+                  CSV
+                </button>
+              </div>
+            </div>
 
-                        {/* Task content */}
-                        <div className={`relative flex items-center gap-3 p-4 transition-transform ${
-                          swipedTaskId === task.id ? '' : ''
-                        }`}>
-                          <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleToggleTask(task)}
-                            className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              task.done
-                                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 border-transparent text-white'
-                                : 'border-gray-300 dark:border-gray-600'
+            {showFilters && (
+              <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4 space-y-3 animate-scale-in">
+                <div>
+                  <span className="text-xs font-medium text-gray-500 uppercase">Status</span>
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={() => applyFilter('all', 'all')}
+                      className={`px-2 py-1 text-sm rounded-md ${!activeFilter ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-100'}`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => applyFilter('status', 'pending')}
+                      className={`px-2 py-1 text-sm rounded-md ${activeFilter?.type === 'status' && activeFilter.value === 'pending' ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-100'}`}
+                    >
+                      Pending
+                    </button>
+                    <button
+                      onClick={() => applyFilter('status', 'done')}
+                      className={`px-2 py-1 text-sm rounded-md ${activeFilter?.type === 'status' && activeFilter.value === 'done' ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-100'}`}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs font-medium text-gray-500 uppercase">Priority</span>
+                  <div className="flex gap-2 mt-1">
+                    {(['high', 'medium', 'low'] as Priority[]).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => applyFilter('priority', p)}
+                        className={`px-2 py-1 text-sm rounded-md capitalize ${activeFilter?.type === 'priority' && activeFilter.value === p ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-100'}`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {projects.length > 0 && (
+                  <div>
+                    <span className="text-xs font-medium text-gray-500 uppercase">Project</span>
+                    <div className="flex gap-2 mt-1 flex-wrap">
+                      {projects.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => applyFilter('project', p.id)}
+                          className={`px-2 py-1 text-sm rounded-md flex items-center gap-1 ${activeFilter?.type === 'project' && activeFilter.value === p.id ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-100'}`}
+                        >
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Task List */}
+            <div className={`space-y-2 ${isLoaded ? 'stagger-children' : ''}`}>
+              {filteredTasks.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-lg border border-gray-200 animate-fade-in-up">
+                  <Sparkles className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-400 text-lg">
+                    {tasks.length === 0
+                      ? "No tasks yet. Add one above!"
+                      : "No tasks match the current filter."}
+                  </p>
+                </div>
+              ) : (
+                filteredTasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`flex items-center gap-3 p-4 bg-white rounded-lg border transition-all hover-lift ${
+                      task.done
+                        ? 'border-gray-200 opacity-60'
+                        : 'border-gray-200 shadow-sm'
+                    } ${isOverdue(task) ? 'border-l-4 border-l-red-500' : ''}`}
+                  >
+                    <button
+                      onClick={() => toggleTask(task.id)}
+                      className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all active-press ${
+                        task.done
+                          ? 'bg-primary-600 border-primary-600 text-white animate-check-pop'
+                          : 'border-gray-300 hover:border-primary-500'
+                      }`}
+                    >
+                      {task.done && <Check className="w-4 h-4" />}
+                    </button>
+
+                    <div className="flex-1 min-w-0">
+                      {editingTaskId === task.id ? (
+                        <div className="flex gap-2 flex-wrap">
+                          <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="flex-1 min-w-[150px] px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          />
+                          <select
+                            value={editPriority}
+                            onChange={(e) => setEditPriority(e.target.value as Priority)}
+                            className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </select>
+                          <select
+                            value={editProjectId || ''}
+                            onChange={(e) => setEditProjectId(e.target.value || null)}
+                            className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          >
+                            <option value="">No Project</option>
+                            {projects.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            type="date"
+                            value={editDueDate}
+                            onChange={(e) => setEditDueDate(e.target.value)}
+                            className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          />
+                          <button
+                            onClick={() => saveEdit(task.id)}
+                            className="p-1 text-green-600 hover:bg-green-50 rounded active-press transition-all"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="p-1 text-gray-400 hover:bg-gray-100 rounded active-press transition-all"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <p
+                            className={`text-sm font-medium truncate ${
+                              task.done ? 'line-through text-gray-400' : 'text-gray-900'
                             }`}
                           >
-                            {task.done && <Check className="w-3.5 h-3.5" />}
-                          </motion.button>
-
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium truncate ${
-                              task.done ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100'
-                            }`}>
-                              {task.title}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium border ${priorityColors[task.priority]}`}>
-                                <Flag className="w-3 h-3" />
-                                {priorityLabels[task.priority]}
+                            {task.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${priorityColors[task.priority]}`}
+                            >
+                              <Flag className="w-3 h-3" />
+                              {priorityLabels[task.priority]}
+                            </span>
+                            {task.projectId && (
+                              <span
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border text-gray-600 bg-gray-50 border-gray-200"
+                              >
+                                <Folder className="w-3 h-3" style={{ color: getProjectColor(task.projectId) || undefined }} />
+                                {getProjectName(task.projectId)}
                               </span>
-                              {task.dueDate && (
-                                <span className={`inline-flex items-center gap-1 text-xs ${
-                                  isOverdue(task) ? 'text-red-500 font-medium' : 'text-gray-400 dark:text-gray-500'
-                                }`}>
-                                  <Calendar className="w-3 h-3" />
-                                  {new Date(task.dueDate).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
+                            )}
+                            {task.dueDate && (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${
+                                  isOverdue(task)
+                                    ? 'text-red-600 bg-red-50 border-red-200'
+                                    : isDueToday(task)
+                                    ? 'text-blue-600 bg-blue-50 border-blue-200'
+                                    : 'text-gray-500 bg-gray-50 border-gray-200'
+                                }`}
+                              >
+                                <Clock className="w-3 h-3" />
+                                {isOverdue(task) && <AlertCircle className="w-3 h-3" />}
+                                {new Date(task.dueDate).toLocaleDateString()}
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-400">
+                              {new Date(task.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
-
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => {
-                                setEditingTaskId(task.id)
-                                setEditTitle(task.title)
-                                setEditPriority(task.priority)
-                                setEditProjectId(task.projectId)
-                                setEditDueDate(task.dueDate || '')
-                              }}
-                              className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTask(task.id)}
-                              className="p-2 text-gray-400 hover:text-red-600 rounded-lg"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {view === 'dashboard' && (
-            <motion.div
-              key="dashboard"
-              variants={fadeIn}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="space-y-4"
-            >
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: 'Total', value: stats.total, icon: Circle, color: 'from-gray-500 to-gray-600' },
-                  { label: 'Pending', value: stats.pending, icon: Circle, color: 'from-amber-500 to-orange-600' },
-                  { label: 'Done', value: stats.done, icon: CheckCircle2, color: 'from-emerald-500 to-green-600' },
-                  { label: 'Overdue', value: stats.overdue, icon: Zap, color: 'from-red-500 to-rose-600' },
-                ].map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm"
-                  >
-                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-2`}>
-                      <stat.icon className="w-4 h-4 text-white" />
+                        </>
+                      )}
                     </div>
-                    <motion.p 
-                      className="text-2xl font-bold text-gray-900 dark:text-white"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.1 + 0.2, type: 'spring' }}
-                    >
-                      {stat.value}
-                    </motion.p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
-                  </motion.div>
-                ))}
+
+                    {!editingTaskId && (
+                      <>
+                        <button
+                          onClick={() => startEdit(task)}
+                          className="flex-shrink-0 p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all active-press"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          className="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all active-press"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Stats */}
+            {tasks.length > 0 && (
+              <div className="mt-6 grid grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift">
+                  <p className="text-2xl font-bold text-gray-900 animate-count-up">{tasks.length}</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Total</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift">
+                  <p className="text-2xl font-bold text-primary-600 animate-count-up">
+                    {tasks.filter((t) => t.done).length}
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Done</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift">
+                  <p className="text-2xl font-bold text-gray-900 animate-count-up">
+                    {Math.round((tasks.filter((t) => t.done).length / tasks.length) * 100) || 0}%
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Progress</p>
+                </div>
               </div>
+            )}
+          </>
+        )}
 
-              {/* Progress */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm"
+        {view === 'projects' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Projects</h2>
+              <button
+                onClick={() => setShowProjectForm(!showProjectForm)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-all active-press text-sm shadow-sm hover:shadow-md"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Completion Rate</h3>
-                  <span className="text-xl font-bold text-indigo-600">{stats.completionRate}%</span>
-                </div>
-                <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${stats.completionRate}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                  />
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+                <Plus className="w-4 h-4" />
+                New Project
+              </button>
+            </div>
 
-      {/* Floating Action Button */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setShowAddModal(true)}
-        className="fixed right-4 bottom-24 z-40 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/40 flex items-center justify-center"
-      >
-        <Plus className="w-6 h-6" />
-      </motion.button>
+            {showProjectForm && (
+              <form onSubmit={handleAddProject} className="bg-white p-4 rounded-lg border border-gray-200 flex gap-2 flex-wrap">
+                <input
+                  type="text"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Project name"
+                  className="flex-1 min-w-[200px] px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <input
+                  type="color"
+                  value={newProjectColor}
+                  onChange={(e) => setNewProjectColor(e.target.value)}
+                  className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                  title="Project color"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-all active-press shadow-sm hover:shadow-md"
+                >
+                  Create
+                </button>
+              </form>
+            )}
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50 safe-area-pb">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-around py-2">
-            {[
-              { id: 'tasks' as View, icon: Home, label: 'Tasks' },
-              { id: 'dashboard' as View, icon: BarChart3, label: 'Stats' },
-              { id: 'projects' as View, icon: Folder, label: 'Projects' },
-            ].map(({ id, icon: Icon, label }) => (
-              <motion.button
-                key={id}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setView(id)}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-                  view === id 
-                    ? 'text-indigo-600 dark:text-indigo-400' 
-                    : 'text-gray-400 dark:text-gray-500'
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{label}</span>
-              </motion.button>
-            ))}
+            {projects.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-lg border border-gray-200 animate-fade-in-up">
+                <Folder className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-400 text-lg">No projects yet. Create one to organize your tasks!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {projects.map((project, index) => {
+                  const projectTasks = tasks.filter((t) => t.projectId === project.id)
+                  const doneCount = projectTasks.filter((t) => t.done).length
+                  return (
+                    <div
+                      key={project.id}
+                      className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover-lift animate-fade-in-up"
+                      style={{ animationDelay: `${(index * 0.05)}s` }}
+                    >
+                      <div className="flex items-center gap-2 mb-3">
+                        <span
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: project.color }}
+                        />
+                        <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                      </div>
+                      <div className="text-sm text-gray-500 mb-3">
+                        {projectTasks.length} tasks · {doneCount} done
+                      </div>
+                      {projectTasks.length > 0 && (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                          <div
+                            className="bg-primary-600 h-2 rounded-full progress-animate"
+                            style={{
+                              width: `${Math.round((doneCount / projectTasks.length) * 100) || 0}%`,
+                            }}
+                          />
+                        </div>
+                      )}
+                      <button
+                        onClick={() => deleteProject(project.id)}
+                        className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1 active-press transition-all"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
-        </div>
-      </nav>
+        )}
+
+        {view === 'dashboard' && (
+          <div className="space-y-6">
+            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
+                <p className="text-3xl font-bold text-gray-900 animate-count-up">{tasks.length}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Total Tasks</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <p className="text-3xl font-bold text-primary-600 animate-count-up">
+                  {tasks.filter((t) => !t.done).length}
+                </p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Pending</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+                <p className="text-3xl font-bold text-green-600 animate-count-up">
+                  {tasks.filter((t) => t.done).length}
+                </p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Completed</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 text-center hover-lift animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <p className="text-3xl font-bold text-red-600 animate-count-up">{overdueCount}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Overdue</p>
+              </div>
+            </div>
+
+            {projects.length > 0 && (
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-4">Project Progress</h3>
+                <div className="space-y-3">
+                  {projects.map((project) => {
+                    const projectTasks = tasks.filter((t) => t.projectId === project.id)
+                    const doneCount = projectTasks.filter((t) => t.done).length
+                    const pct = Math.round((doneCount / projectTasks.length) * 100) || 0
+                    return (
+                      <div key={project.id}>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: project.color }}
+                            />
+                            <span className="text-sm font-medium text-gray-700">{project.name}</span>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {doneCount}/{projectTasks.length} ({pct}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-2 rounded-full progress-animate"
+                            style={{
+                              width: `${pct}%`,
+                              backgroundColor: project.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h3 className="font-semibold text-gray-900 mb-4">Priority Breakdown</h3>
+              <div className="space-y-3">
+                {(['high', 'medium', 'low'] as Priority[]).map((p) => {
+                  const count = tasks.filter((t) => t.priority === p && !t.done).length
+                  const total = tasks.filter((t) => t.priority === p).length
+                  return (
+                    <div key={p}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium capitalize text-gray-700">{p} Priority</span>
+                        <span className="text-sm text-gray-500">
+                          {count} pending / {total} total
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full progress-animate ${
+                            p === 'high'
+                              ? 'bg-red-500'
+                              : p === 'medium'
+                              ? 'bg-yellow-500'
+                              : 'bg-green-500'
+                          }`}
+                          style={{ width: `${total > 0 ? Math.round(((total - count) / total) * 100) : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   )
 }

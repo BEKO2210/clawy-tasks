@@ -104,6 +104,39 @@ Append-only journal of every working session. Newest entry on top. Never delete 
 - Used native `<input type="date">` for due dates — simple, accessible.
 - Export uses Blob + anchor download — no server required.
 
+## Run #004 — 2026-05-05 — Micro-Animationen & Polish
+
+**Phase:** Phase 1 — MVP Refinement
+**Duration:** ~1h
+**Goal going in:** Weitere Micro-Verbesserungen, Animationen, Hover-States
+
+**What changed**
+- `src/index.css`: Globale Animationen (fadeInUp, scaleIn, checkPop, slideDown, countUp), Stagger-Children, Hover-Lift, Active-Press, Progress-Bar-Animation, Scrollbar-Styling, Mobile Touch-Targets.
+- `src/App.tsx`: Staggered Task-Entry, Checkbox Pop-Animation, Hover-Lift auf Cards, Active-Press auf allen Buttons, Counter-Animation auf Stats, Filter-Panel Scale-In, Empty-States mit Icons.
+- `src/main.tsx`: StrictMode entfernt für bessere Performance.
+- `vite.config.ts`: React externalized für korrekten Build.
+
+**What works now**
+- Tasks erscheinen mit Staggered-Animation (0.02s Delay pro Item).
+- Checkbox hat Pop-Effekt beim Checken.
+- Alle Cards heben sich bei Hover leicht ab.
+- Buttons haben Active-Press Feedback (scale 0.98).
+- Stats zählen mit Fade-In hoch.
+- Progress-Bars animieren sanft.
+- Build erfolgreich.
+
+**What's still broken or missing**
+- Vercel Deploy fehlgeschlagen (Token ungültig) — `vercel login` nötig.
+
+**Decisions**
+- Referenz: Linear.app für Mikro-Interaktionen.
+- Keine React StrictMode — vermeidet doppelte Renders in Dev.
+
+**Next session starts with**
+- Vercel Token erneuern und deployen.
+
+---
+
 **Next session starts with**
 - Commit and push all changes. Then proceed to create landing page and marketing materials.
 

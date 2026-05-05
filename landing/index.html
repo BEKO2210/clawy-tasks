@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clawy Tasks — Simple Task Management for Solopreneurs</title>
+  <meta name="description" content="Clawy Tasks is a free, offline-first task management PWA for solopreneurs and indie hackers. Organize projects, set priorities, track progress.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .gradient-cta {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+    }
+    .pricing-card:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🔥</span>
+        <span class="font-bold text-xl text-gray-900">Clawy Tasks</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#features" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+        <a href="#pricing" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+        <a href="https://github.com/BEKO2210/clawy-tasks" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
+        <a href="../index.html" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
+          Open App
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="gradient-hero text-white py-20 md:py-32">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+        Task Management That<br>Just Works
+      </h1>
+      <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+        No signups. No subscriptions. No cloud lock-in. <br class="hidden md:block">
+        A free, offline-first task manager for solopreneurs who ship.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="../index.html" class="px-8 py-4 bg-white text-primary-700 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+          Start Using Free →
+        </a>
+        <a href="#features" class="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition-colors">
+          See Features
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-blue-200">
+        ⚡ Works offline · 📱 Installable PWA · 🔒 Your data stays local
+      </p>
+    </div>
+  </section>
+
+  <!-- Social Proof -->
+  <section class="py-12 bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <p class="text-sm text-gray-500 uppercase tracking-wide mb-4">Trusted by indie hackers & solopreneurs</p>
+      <div class="flex flex-wrap justify-center gap-8 text-gray-400">
+        <span class="font-semibold text-gray-600">Product Hunt</span>
+        <span class="font-semibold text-gray-600">Indie Hackers</span>
+        <span class="font-semibold text-gray-600">Hacker News</span>
+        <span class="font-semibold text-gray-600">Twitter/X</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Everything You Need. Nothing You Don't.</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Built for people who want to ship, not configure. Organize tasks by project, set priorities, track deadlines, and export your data anytime.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Projects & Organization</h3>
+          <p class="text-sm text-gray-600">Group tasks into projects with custom colors. See progress at a glance.</p>
+        </div>
+
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Due Dates & Reminders</h3>
+          <p class="text-sm text-gray-600">Set deadlines. Overdue tasks get highlighted. Never miss a ship date again.</p>
+        </div>
+
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Smart Filtering</h3>
+          <p class="text-sm text-gray-600">Filter by project, priority, or status. Find what matters in seconds.</p>
+        </div>
+
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Dashboard & Stats</h3>
+          <p class="text-sm text-gray-600">Visual progress bars, completion rates, and priority breakdowns.</p>
+        </div>
+
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Data Export</h3>
+          <p class="text-sm text-gray-600">Export to JSON or CSV anytime. Your data, your control. No lock-in.</p>
+        </div>
+
+        <div class="feature-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">PWA — Install Anywhere</h3>
+          <p class="text-sm text-gray-600">Install on desktop or mobile. Works offline. Native-app feel, web simplicity.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Get Started in 30 Seconds</h2>
+        <p class="text-gray-600">No account. No setup. Just open and start shipping.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-600">1</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Open the App</h3>
+          <p class="text-sm text-gray-600">Click "Start Using Free" — it opens instantly in your browser. No install required.</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-600">2</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Add Your First Task</h3>
+          <p class="text-sm text-gray-600">Type what you need to do, pick a priority, maybe assign it to a project. Done.</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-600">3</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Ship Every Day</h3>
+          <p class="text-sm text-gray-600">Check tasks off, watch your progress grow, export when you need a backup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Simple Pricing</h2>
+        <p class="text-gray-600">Free forever for personal use. Pro when you need more power.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <!-- Free -->
+        <div class="pricing-card bg-white p-8 rounded-2xl border border-gray-200 shadow-sm transition-all duration-300">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Free</h3>
+            <p class="text-gray-500 text-sm mt-1">For solo builders</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold text-gray-900">$0</span>
+            <span class="text-gray-500">/month</span>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Unlimited tasks
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Up to 3 projects
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Priority & due dates
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              JSON/CSV export
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Offline PWA
+            </li>
+          </ul>
+          <a href="../index.html" class="block w-full text-center px-4 py-3 bg-gray-100 text-gray-900 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+            Get Started Free
+          </a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card bg-white p-8 rounded-2xl border-2 border-primary-500 shadow-lg transition-all duration-300 relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded-full">
+            MOST POPULAR
+          </div>
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Pro</h3>
+            <p class="text-gray-500 text-sm mt-1">For serious builders</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold text-gray-900">$5</span>
+            <span class="text-gray-500">/month</span>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Everything in Free
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Unlimited projects
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Cloud sync across devices
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Advanced analytics
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-700">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Priority support
+            </li>
+          </ul>
+          <a href="#stripe" class="block w-full text-center px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors">
+            Upgrade to Pro
+          </a>
+        </div>
+      </div>
+
+      <p class="text-center text-sm text-gray-500 mt-8">
+        Pro powered by Stripe. Cancel anytime. No questions asked.
+      </p>
+    </div>
+  </section>
+
+  <!-- Stripe Integration Placeholder -->
+  <section id="stripe" class="py-16 bg-white border-t border-gray-200">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Ready to Go Pro?</h2>
+      <p class="text-gray-600 mb-8">
+        Upgrade in seconds with Stripe. Secure payment, instant activation.
+      </p>
+      <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+        <p class="text-sm text-gray-600 mb-4">
+          🔧 Stripe integration coming soon. For now, <a href="mailto:hello@clawy.dev" class="text-primary-600 hover:underline">contact us</a> to upgrade.
+        </p>
+        <p class="text-xs text-gray-400">
+          Stripe Checkout will be integrated here. Test mode available for development.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="gradient-cta text-white py-20">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-4">Stop Managing Tasks. Start Shipping.</h2>
+      <p class="text-lg text-pink-100 mb-8">
+        Join solopreneurs who use Clawy Tasks to stay focused and ship consistently.
+      </p>
+      <a href="../index.html" class="inline-block px-8 py-4 bg-white text-pink-600 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+        Start Using Free →
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🔥</span>
+            <span class="font-bold text-white">Clawy Tasks</span>
+          </div>
+          <p class="text-sm">Simple task management for solopreneurs who ship.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-medium mb-4">Product</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="../index.html" class="hover:text-white transition-colors">App</a></li>
+            <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+            <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-medium mb-4">Resources</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="https://github.com/BEKO2210/clawy-tasks" class="hover:text-white transition-colors">GitHub</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Changelog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-medium mb-4">Connect</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Twitter / X</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Product Hunt</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Indie Hackers</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 pt-8 text-sm text-center">
+        <p>© 2026 Clawy Tasks. Built with 🔥 by <a href="https://github.com/BEKO2210" class="text-white hover:underline">BEKO2210</a>.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
